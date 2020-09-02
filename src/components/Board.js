@@ -37,62 +37,95 @@ const Board = (prop) => {
         setState({ squares: s, xIsNext: !state.xIsNext, count: state.count + 1 });
     }
 
+    // calcula la cantidad de lineas donde el usuario puede ganar
+    const findPossibilitiesUserWin = (s) => {
+        let lines = linesWin;
+        let countFPW = 0;
+        for (let i = 0; i < lines.length; i++) {
+            let [a, b, c] = lines[i];
+            let x = lines[i].filter(x => s[x] === 'X');
+
+            // si una linea tiene dos X y el lugar que sobra es null, esa hay que bloquear
+            if (x.length == 2 && (!s[a] || !s[b] || !s[c]))
+                countFPW++;
+            else
+                countFPW = countFPW;
+        }
+        return countFPW;
+    }
+
+    //
     const handleClickIA = () => {
         console.log(state.count);
         let s = state.squares.slice();
         let bandera = true;
-        // para que no comience a jugar la maquina
+        // para que la maquina no comiece el juego
         if (state.count === 0 || calculateWinner(s)) {
             return;
         }
-        // que solo el primer movimiento sea aleatorio
+        // el primer movimiento de la maquina es Random
         if (state.count === 1) {
-            movementAleatorio(s);
+            movementRandom(s);
             bandera = true;
         }
-        // cuando el usuario ya jugo 2 veces
+        // cuando el usuario ya movió 2 veces
         else if (state.count > 1) {
-            let lines = linesWin;
-            for (let i = 0; i < lines.length; i++) {
-                let [a, b, c] = lines[i];
-                let x = lines[i].filter(x => s[x] === 'X');
-                let o = lines[i].filter(x => s[x] === 'O');
-                console.log(x);
-                console.log(s[a], s[b], s[c]);
-                //si la maquina tiene oportunidad de ganar que mueva 
-                if (o.length == 2 && (!s[a]|| !s[b] || !s[c])) {
-                    searchWin(s);
-                    bandera = true;
-                    return;
-                }//si no tiene posibilidad de ganar en esa linea entonces que bloquee al user
-                else if (x.length == 2 && (!s[a]|| !s[b] || !s[c])){
-                    bandera = true;
-                    if (s[a] === 'X' && s[a] === s[b] && s[c] === null) {
-                        console.log('marcara la casilla c: ' + c);
-                        handleGameAI(s, c);
-                        return;
-                    } else if (s[a] === 'X' && s[b] === null && s[c] === s[a]) {
-                        console.log('marcara la casilla b: ' + b);
-                        handleGameAI(s, b);
-                        return;
-                    } else if (s[a] === null && s[b] === 'X' && s[c] === s[b]) {
-                        console.log('marcara la casilla a: ' + a);
-                        handleGameAI(s, a);
-                        return;
-                    }
-                }else{
-                    bandera = false;
-                }
+            let fpw = findPossibilitiesUserWin(s);
+            console.log(fpw);
+            switch (fpw) {
 
-                }
-            }else if(!bandera){
-                movementAleatorio(s);
-            return;
+                // si el usuario no puede ganar, la maquina hace un movimiento random
+                case 0:
+                    movementRandom(s);
+                    break;
+
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                    findNextMovementUSer(s);
+                    break;
+
+                default: break;
+            }
         }
-
-
     }
 
+    // busca cual seria el proximo movimiento del usuario para bloquearlo
+    const findNextMovementUSer = (s) => {
+        let lines = linesWin;
+        for (let i = 0; i < lines.length; i++) {
+            let [a, b, c] = lines[i];
+            let x = lines[i].filter(x => s[x] === 'X');
+            let o = lines[i].filter(x => s[x] === 'O');
+            console.log(x);
+            console.log(s[a], s[b], s[c]);
+            //si la maquina tiene oportunidad de ganar que mueva 
+            if (o.length == 2 && (!s[a] || !s[b] || !s[c])) {
+                searchWin(s);
+                return;
+            }//si no tiene posibilidad de ganar en esa linea entonces que bloquee al user
+            else if (x.length == 2 && (!s[a] || !s[b] || !s[c])) {
+                if (s[a] === 'X' && s[a] === s[b] && s[c] === null) {
+                    console.log('marcara la casilla c: ' + c);
+                    handleGameAI(s, c);
+                    return;
+                } else if (s[a] === 'X' && s[b] === null && s[c] === s[a]) {
+                    console.log('marcara la casilla b: ' + b);
+                    handleGameAI(s, b);
+                    return;
+                } else if (s[a] === null && s[b] === 'X' && s[c] === s[b]) {
+                    console.log('marcara la casilla a: ' + a);
+                    handleGameAI(s, a);
+                    return;
+                }
+            }
+        }
+    }
     // setea en la casilla correspondiente para evitar que el user gane
     // cuando el usuario esta por completar una fila
     const handleGameAI = (s, i) => {
@@ -102,14 +135,14 @@ const Board = (prop) => {
         }, 500)
     }
 
-    // movimiento aleatorio
-    const movementAleatorio = (s) => {
+    // movimiento Random
+    const movementRandom = (s) => {
         setTimeout(() => {
             let i = Math.round(Math.random() * (8 - 0) + parseInt(0));
             console.log(`casilla aleatoria:` + i);
-            // si la casilla ya esta ocupada, que busque otro aleatorio
+            // si la casilla ya esta ocupada, que busque otro Random
             if (s[i]) {
-                movementAleatorio(s);
+                movementRandom(s);
                 return;
             } else {
                 s[i] = 'O';
