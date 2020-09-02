@@ -6,12 +6,8 @@ const Game = () => {
     return (
         <Fragment>
             <div className="game">
-                <div className="game-board">
+                <div className="row justify-content-center p-3">
                     <Board />
-                </div>
-                <div className="game-info">
-                    <div>{/* status */}</div>
-                    <ol>{/* TODO */}</ol>
                 </div>
             </div>
         </Fragment>
