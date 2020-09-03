@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/REACT-tateti/precache-manifest.77d49cc364b446e8639bc1ba99c737ca.js"
+  "/REACT-tateti/precache-manifest.c06636ad4095fc40320e48afe135bf8c.js"
 );
 
 self.addEventListener('message', (event) => {
